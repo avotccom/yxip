@@ -9,13 +9,20 @@ on:
 jobs:
   update-ip-list:
     runs-on: ubuntu-latest
-    permissions:  # 添加权限声明
-      contents: write  # 授予写入权限
+    permissions:
+      contents: write
+
+    # 定义可复用的变量
+    env:
+      GIT_EMAIL: "avotc@gmail.com"
+      GIT_NAME: "avotc"
+      TARGET_BRANCH: "main"
 
     steps:
     - uses: actions/checkout@v3
       with:
-        fetch-depth: 0  # 获取完整提交历史
+        fetch-depth: 0
+        ref: ${{ env.TARGET_BRANCH }}  # 使用变量指定分支
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -32,16 +39,16 @@ jobs:
         
     - name: Commit and push changes
       run: |
-        # 设置本地git配置（非全局）
-        git config user.email "avotc@gmail.com"
-        git config user.name "avotc"
+        # 使用变量设置git配置
+        git config user.email "${{ env.GIT_EMAIL }}"
+        git config user.name "${{ env.GIT_NAME }}"
         
         if [ -n "$(git status --porcelain)" ]; then
           git add ip.txt
           git commit -m "Automatic update"
           
-          # 使用认证URL推送
-          git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:main
+          # 使用变量推送
+          git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:${{ env.TARGET_BRANCH }}
         else
           echo "没有文件变更，跳过提交"
         fi
