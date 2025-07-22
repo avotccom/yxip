@@ -12,7 +12,6 @@ jobs:
     permissions:
       contents: write
 
-    # 定义可复用的变量
     env:
       GIT_EMAIL: "avotc@gmail.com"
       GIT_NAME: "avotc"
@@ -22,7 +21,7 @@ jobs:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0
-        ref: ${{ env.TARGET_BRANCH }}  # 使用变量指定分支
+        token: ${{ secrets.GITHUB_TOKEN }}  # 关键修复：添加token参数
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -39,7 +38,7 @@ jobs:
         
     - name: Commit and push changes
       run: |
-        # 使用变量设置git配置
+        # 使用局部配置（非全局）
         git config user.email "${{ env.GIT_EMAIL }}"
         git config user.name "${{ env.GIT_NAME }}"
         
@@ -47,7 +46,7 @@ jobs:
           git add ip.txt
           git commit -m "Automatic update"
           
-          # 使用变量推送
+          # 使用认证URL推送（关键修复）
           git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:${{ env.TARGET_BRANCH }}
         else
           echo "没有文件变更，跳过提交"
