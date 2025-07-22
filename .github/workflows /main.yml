@@ -1,4 +1,4 @@
-name: 更新 IP 列表
+name: Update IP List
 
 on:
   schedule:
@@ -9,15 +9,13 @@ on:
 jobs:
   update-ip-list:
     runs-on: ubuntu-latest
-    # 关键修复：添加写入权限
-    permissions:
-      contents: write  # 授予GITHUB_TOKEN写入权限
+    permissions:  # 添加权限声明
+      contents: write  # 授予写入权限
 
     steps:
     - uses: actions/checkout@v3
       with:
-        # 推荐添加fetch-depth获取完整历史
-        fetch-depth: 0  
+        fetch-depth: 0  # 获取完整提交历史
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -30,11 +28,11 @@ jobs:
         pip install requests beautifulsoup4
         
     - name: Run script
-      run: python yxip.py  # 简化路径
+      run: python yxip.py
         
     - name: Commit and push changes
       run: |
-        # 设置局部用户信息（非全局）
+        # 设置本地git配置（非全局）
         git config user.email "avotc@gmail.com"
         git config user.name "avotc"
         
@@ -42,8 +40,8 @@ jobs:
           git add ip.txt
           git commit -m "Automatic update"
           
-          # 关键修复：使用GITHUB_TOKEN推送
-          git push "https://$GITHUB_ACTOR:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+          # 使用认证URL推送
+          git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:main
         else
           echo "没有文件变更，跳过提交"
         fi
