@@ -18,10 +18,10 @@ jobs:
       TARGET_BRANCH: "main"
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/avotccom@v3
       with:
         fetch-depth: 0
-        token: ${{ secrets.GITHUB_TOKEN }}  # 关键修复：添加token参数
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Set up Python
       uses: actions/setup-python@v4
